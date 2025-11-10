@@ -1,0 +1,42 @@
+name: whale_signal
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "5 * * * *"   # her saat :05'te çalışır (az spam)
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID:        ${{ secrets.CHAT_ID }}
+          # — opsiyonel ayarlar —
+          W_MIN_USD: "1500000"
+          W_EMA_N:   "12"
+          W_RATIO:   "1.35"
+          W_DECAY_HRS: "36"
+          RSI_BUY:   "55.0"
+          RSI_SELL:  "45.0"
+          ADX_BUY:   "20.0"
+          ADX_SELL:  "18.0"
+          NEAR_THR:  "0.4"
+          MIN_CONF:  "75"
+        run: |
+          python main.py
